@@ -1,61 +1,57 @@
-<div class="flex min-h-screen flex-col items-center bg-[#0d1117] font-['Cutive_Mono',monospace] text-white">
-  <!-- Navbar -->
-  <nav class="flex h-[100px] w-full items-center justify-between bg-[#24292e] px-10 shadow-sm">
-    <div class="flex h-[57px] w-[60px] items-center justify-center">
-      <!-- Simple Clock Logo -->
-      <svg class="h-10 w-10 text-[#2ea44f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/>
-        <polyline points="12 6 12 12 16 14"/>
-      </svg>
-    </div>
-
-    <div class="flex items-center gap-4 bg-[#0d1117] p-1.5 rounded-lg border-[0.5px] border-[#e1e4e8]/20">
-      <button class="rounded-md bg-[#24292e] px-6 py-1.5 text-[15px] font-medium shadow-sm">Timer</button>
-      <button class="px-6 py-1.5 text-[15px] opacity-60 hover:opacity-100 transition-opacity">Sessions</button>
-      <button class="px-6 py-1.5 text-[15px] opacity-60 hover:opacity-100 transition-opacity">Settings</button>
-    </div>
-
-    <div class="w-[60px]"></div> <!-- Spacer to center the nav set -->
-  </nav>
-
+<app-main-layout>
   <main class="mt-16 flex w-full flex-col items-center px-4">
     <!-- Mode Selector -->
-    <div class="flex items-center gap-2 rounded-lg bg-[#24292e] p-1 border-[0.5px] border-[#e1e4e8]/10 shadow-inner">
+    <div
+      class="flex items-center gap-2 rounded-lg bg-[#24292e] p-1 border-[0.5px] border-[#e1e4e8]/10 shadow-inner"
+    >
       <button
         (click)="store.changeMode('focus')"
         class="rounded-md px-5 py-2 text-[15px] transition-all"
-        [class]="store.mode() === 'focus' ? 'bg-[#56b976] text-white' : 'text-white/70 hover:text-white hover:bg-white/5'"
+        [class]="
+          store.mode() === 'focus'
+            ? 'bg-[#56b976] text-white'
+            : 'text-white/70 hover:text-white hover:bg-white/5'
+        "
       >
         Pomodoro
       </button>
       <button
         (click)="store.changeMode('short-break')"
         class="rounded-md px-5 py-2 text-[15px] transition-all"
-        [class]="store.mode() === 'short-break' ? 'bg-[#56b976] text-white' : 'text-white/70 hover:text-white hover:bg-white/5'"
+        [class]="
+          store.mode() === 'short-break'
+            ? 'bg-[#56b976] text-white'
+            : 'text-white/70 hover:text-white hover:bg-white/5'
+        "
       >
         Short Break
       </button>
       <button
         (click)="store.changeMode('long-break')"
         class="rounded-md px-5 py-2 text-[15px] transition-all"
-        [class]="store.mode() === 'long-break' ? 'bg-[#56b976] text-white' : 'text-white/70 hover:text-white hover:bg-white/5'"
+        [class]="
+          store.mode() === 'long-break'
+            ? 'bg-[#56b976] text-white'
+            : 'text-white/70 hover:text-white hover:bg-white/5'
+        "
       >
         Long Break
       </button>
     </div>
 
     <!-- Timer Card -->
-    <div class="mt-8 flex w-full max-w-[471px] flex-col overflow-hidden rounded-xl border-[0.5px] border-[#e1e4e8]/20 bg-[#24292e] shadow-xl">
+    <div
+      class="mt-8 flex w-full max-w-[471px] flex-col overflow-hidden rounded-xl border-[0.5px] border-[#e1e4e8]/20 bg-[#24292e] shadow-xl"
+    >
       <div class="flex flex-col items-center py-12">
-        <span class="font-['Fira_Mono',monospace] text-[96px] font-medium leading-none tracking-tighter">
+        <span
+          class="font-['Fira_Mono',monospace] text-[96px] font-medium leading-none tracking-tighter"
+        >
           {{ store.formattedTime() }}
         </span>
         <span class="mt-6 text-[18px] font-medium tracking-[0.2em] text-white/90 uppercase">
-          @switch (store.mode()) {
-            @case ('focus') { TIEMPO DE ENFOQUE }
-            @case ('short-break') { DESCANSO CORTO }
-            @case ('long-break') { DESCANSO LARGO }
-          }
+          @switch (store.mode()) { @case ('focus') { FOCUS TIME } @case ('short-break') {
+          SHORT BREAK } @case ('long-break') { LONG BREAK } }
         </span>
       </div>
 
@@ -63,62 +59,64 @@
 
       <div class="flex flex-col gap-4 p-8">
         @if (store.status() !== 'running') {
-          <button
-            (click)="store.start()"
-            class="flex h-[40px] w-full items-center justify-center gap-3 rounded-md bg-[#2ea44f] text-[14px] font-bold transition-all hover:bg-[#2c974b] active:scale-[0.98]"
-          >
-            <svg class="h-4 w-4 fill-white" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-            Start Timer
-          </button>
+        <app-custom-btn variant="primary" [fullWidth]="true" (btnClick)="store.start()">
+          <svg class="h-4 w-4 fill-white" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          Start Timer
+        </app-custom-btn>
         } @else {
-          <button
-            (click)="store.pause()"
-            class="flex h-[40px] w-full items-center justify-center gap-3 rounded-md bg-[#f85149] text-[14px] font-bold transition-all hover:bg-[#da3633] active:scale-[0.98]"
-          >
-            <svg class="h-4 w-4 fill-white" viewBox="0 0 24 24">
-              <rect x="6" y="4" width="4" height="16"/>
-              <rect x="14" y="4" width="4" height="16"/>
-            </svg>
-            Pause Timer
-          </button>
+        <app-custom-btn variant="danger" [fullWidth]="true" (btnClick)="store.pause()">
+          <svg class="h-4 w-4 fill-white" viewBox="0 0 24 24">
+            <rect x="6" y="4" width="4" height="16" />
+            <rect x="14" y="4" width="4" height="16" />
+          </svg>
+          Pause Timer
+        </app-custom-btn>
         }
 
         <div class="flex gap-4">
-          <button
-            (click)="store.reset()"
-            class="flex h-[40px] flex-1 items-center justify-center rounded-md border-[0.5px] border-[#e1e4e8]/20 bg-transparent text-[13px] font-medium transition-all hover:bg-white/5 active:scale-[0.98]"
+          <app-custom-btn
+            variant="outline"
+            [fullWidth]="true"
+            class="flex-1"
+            (btnClick)="store.reset()"
           >
             Stop
-          </button>
-          <button
-            (click)="store.nextMode()"
-            class="flex h-[40px] flex-1 items-center justify-center rounded-md border-[0.5px] border-[#e1e4e8]/20 bg-transparent text-[13px] font-medium transition-all hover:bg-white/5 active:scale-[0.98]"
+          </app-custom-btn>
+          <app-custom-btn
+            variant="outline"
+            [fullWidth]="true"
+            class="flex-1"
+            (btnClick)="store.nextMode()"
           >
             Skip
-          </button>
+          </app-custom-btn>
         </div>
       </div>
     </div>
 
     <!-- Sessions Card -->
-    <div class="mt-8 flex w-full max-w-[471px] flex-col rounded-xl border-[0.5px] border-[#e1e4e8]/20 bg-[#24292e] p-6 shadow-lg">
+    <div
+      class="mt-8 flex w-full max-w-[471px] flex-col rounded-xl border-[0.5px] border-[#e1e4e8]/20 bg-[#24292e] p-6 shadow-lg"
+    >
       <div class="flex items-center justify-between mb-5">
         <span class="text-[15px] font-medium text-white/90">Today's sessions</span>
         <span class="text-[14px] font-medium opacity-50">{{ store.cyclesCount() }}/8 completed</span>
       </div>
-      
+
       <div class="flex gap-2.5">
         @for (i of [1,2,3,4,5,6,7,8]; track i) {
-          <div
-            class="h-[22px] w-[22px] rounded-[3px] border-[0.5px] transition-colors duration-500"
-            [class]="i <= store.cyclesCount() 
-              ? 'bg-[#2ea44f] border-[#2ea44f] shadow-[0_0_10px_rgba(46,164,79,0.2)]' 
-              : 'bg-[#0d1117] border-[#e1e4e8]/10'"
-          ></div>
+        <div
+          class="h-[22px] w-[22px] rounded-[3px] border-[0.5px] transition-colors duration-500"
+          [class]="
+            i <= store.cyclesCount()
+              ? 'bg-[#2ea44f] border-[#2ea44f] shadow-[0_0_10px_rgba(46,164,79,0.2)]'
+              : 'bg-[#0d1117] border-[#e1e4e8]/10'
+          "
+        ></div>
         }
       </div>
     </div>
   </main>
-</div>
+</app-main-layout>
