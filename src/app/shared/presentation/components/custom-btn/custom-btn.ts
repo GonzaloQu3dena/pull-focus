@@ -9,7 +9,8 @@ export type ButtonVariant = 'primary' | 'danger' | 'outline' | 'ghost';
   styleUrl: './custom-btn.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'flex',
+    class: 'inline-flex',
+    '[class.w-full]': 'fullWidth()',
   },
 })
 export class CustomBtn {
@@ -25,6 +26,10 @@ export class CustomBtn {
    * Input to set the button variant.
    */
   variant = input<ButtonVariant>('primary');
+  /**
+   * Input to set the button type.
+   */
+  type = input<'button' | 'submit' | 'reset'>('button');
 
   /**
    * Output to emit when the button is clicked.
