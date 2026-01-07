@@ -5,6 +5,8 @@ import { TimerStatus } from '../domain/value-objects/timer-status';
 import { TimerStorage } from '../infrastructure/persistence/timer-storage';
 import { TimerMode } from '../domain/value-objects/timer-mode';
 import { SettingsStore } from './settings.store';
+import { SessionsStore } from './sessions.store';
+import { SessionType } from '../domain/value-objects/session-type';
 
 /**
  * Timer Store
@@ -17,6 +19,7 @@ export class TimerStore {
   // State
   private _storage = inject(TimerStorage);
   private _settingsStore = inject(SettingsStore);
+  private _sessionsStore = inject(SessionsStore);
   private _destroyRef = inject(DestroyRef);
   private _timer = signal<Timer>(this._initialTimer());
   private _intervalId: any = null;
@@ -113,6 +116,24 @@ export class TimerStore {
   }
 
   /**
+   * Full reset: timer, sessions and settings.
+   */
+  fullReset(): void {
+    this._stopCountdown();
+    this._sessionsStore.clearAll();
+    this._settingsStore.resetToDefaults();
+    this._updateTimer({
+      mode: 'focus',
+      status: 'idle',
+      startedAt: null,
+      pausedAt: null,
+      completedAt: null,
+      remainingSeconds: this._getDuration('focus'),
+      cyclesCount: 0,
+    });
+  }
+
+  /**
    * Switch to a different mode.
    * @param mode - The mode to switch to.
    */
@@ -130,13 +151,30 @@ export class TimerStore {
 
   /**
    * Advance to the next Pomodoro mode automatically.
+   * @param logSkipped - Whether to log this as a skipped session.
    */
-  nextMode(): void {
+  nextMode(logSkipped = true): void {
     const currentMode = this.mode();
     const cycles = this.cyclesCount();
     const roundInterval = this._settingsStore.roundInterval();
-    let nextMode: TimerMode;
+    const wasRunningOrPaused = this.status() === 'running' || this.status() === 'paused';
+    
+    // Log skipped session if timer was active
+    if (logSkipped && wasRunningOrPaused && this._timer().startedAt) {
+      const startedAt = this._timer().startedAt!;
+      const endedAt = new Date();
+      const elapsedSeconds = Math.round((endedAt.getTime() - startedAt.getTime()) / 1000);
+      
+      this._sessionsStore.logSession({
+        type: currentMode as SessionType,
+        status: 'skipped',
+        startedAt,
+        endedAt,
+        durationMinutes: Math.round(elapsedSeconds / 60) || 1,
+      });
+    }
 
+    let nextMode: TimerMode;
     if (currentMode === 'focus') {
       nextMode = cycles % roundInterval === 0 && cycles > 0 ? 'long-break' : 'short-break';
     } else {
@@ -144,6 +182,13 @@ export class TimerStore {
     }
 
     this.changeMode(nextMode);
+  }
+
+  /**
+   * Reset the cycles count to zero.
+   */
+  resetCycles(): void {
+    this._updateTimer({ cyclesCount: 0 });
   }
 
   private _getDuration(mode: TimerMode): number {
@@ -157,6 +202,10 @@ export class TimerStore {
     }
   }
 
+  /**
+   * The initial timer.
+   * @returns The initial timer.
+   */
   private _initialTimer(): Timer {
     const saved = this._storage.get();
     if (saved) return saved;
@@ -196,18 +245,38 @@ export class TimerStore {
     this._stopCountdown();
 
     const isFocus = this.mode() === 'focus';
+    const endedAt = new Date();
+    const startedAt = this._timer().startedAt ?? endedAt;
+    const mode = this.mode();
+
     this._updateTimer({
       status: 'completed',
-      completedAt: new Date(),
+      completedAt: endedAt,
       cyclesCount: isFocus ? this.cyclesCount() + 1 : this.cyclesCount(),
     });
 
-    if (this._settingsStore.autoStart() && isFocus) {
-      this.nextMode();
+    // Log the completed session
+    this._sessionsStore.logSession({
+      type: mode as SessionType,
+      status: 'completed',
+      startedAt,
+      endedAt,
+      durationMinutes: Math.round(this._getDuration(mode) / 60),
+    });
+
+    // Transition to the next mode so it doesn't stay at 00:00
+    this.nextMode(false);
+
+    // Auto-start next session if enabled
+    if (this._settingsStore.autoStart()) {
       this.start();
     }
   }
 
+  /**
+   * Update the timer.
+   * @param partial - The partial timer.
+   */
   private _updateTimer(
     partial: Partial<{
       mode: TimerMode;

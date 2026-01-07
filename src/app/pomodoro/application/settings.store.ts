@@ -73,6 +73,20 @@ export class SettingsStore {
   }
 
   /**
+   * Reset the settings to their default values.
+   */
+  resetToDefaults(): void {
+    this._settings.set(new TimerSettings({
+      id: 1,
+      focusDuration: 25,
+      shortBreakDuration: 5,
+      longBreakDuration: 15,
+      roundInterval: 4,
+      autoStart: false
+    }));
+  }
+
+  /**
    * The initial settings of the timer.
    */
   private _initialSettings(): TimerSettings {

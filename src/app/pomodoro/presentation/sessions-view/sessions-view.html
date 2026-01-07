@@ -1,0 +1,154 @@
+<app-main-layout>
+  <main class="mt-8 flex w-full flex-col px-24 pb-16">
+    <!-- Header -->
+    <header class="flex flex-col gap-2">
+      <h1 class="font-['Fira_Mono',monospace] text-[40px] font-medium text-white">
+        Sessions
+      </h1>
+      <p class="font-['Cutive_Mono',monospace] text-[18px] text-white/80">
+        Detailed record of your activity and productive approach
+      </p>
+      <div class="mt-2 h-[0.5px] w-full bg-[#e1e4e8]/20"></div>
+    </header>
+
+    <!-- Stats Card -->
+    <div
+      class="mt-6 flex w-[370px] flex-col gap-4 rounded-lg border-[0.5px] border-[#e1e4e8]/20 bg-[#24292e] p-5"
+    >
+      <span class="font-['Cutive_Mono',monospace] text-[18px] text-white">
+        Total hours (Today)
+      </span>
+      <div class="flex items-end gap-1">
+        <span class="font-['Fira_Mono',monospace] text-[36px] font-medium text-white">
+          {{ store.totalHoursToday() }}
+        </span>
+        <span class="pb-1 font-['Cutive_Mono',monospace] text-[18px] text-white">
+          hours
+        </span>
+      </div>
+      @if (store.todaySessions().length > 0) {
+        <div
+          class="w-fit rounded-full bg-[rgba(46,164,79,0.3)] px-2 py-1"
+        >
+          <span class="font-['Cutive_Mono',monospace] text-[13px] text-[#20e457]">
+            {{ store.todaySessions().length }} sessions today
+          </span>
+        </div>
+      }
+    </div>
+
+    <!-- Sessions List -->
+    <div class="mt-8 flex flex-col gap-8">
+      @for (group of store.groupedByDate(); track group.date) {
+        <div class="flex flex-col">
+          <!-- Date Header -->
+          <div class="flex items-center gap-4">
+            <div
+              class="rounded-full bg-[#3c4248] px-3 py-1.5"
+            >
+              <span class="font-['Fira_Mono',monospace] text-[12px] font-bold text-white">
+                {{ group.label }}
+              </span>
+            </div>
+            <div class="h-[0.5px] flex-1 bg-[#e1e4e8]/20"></div>
+          </div>
+
+          <!-- Sessions for this date -->
+          <div class="ml-2 mt-4 flex flex-col gap-4 border-l border-[#e1e4e8]/20 pl-8">
+            @for (session of group.sessions; track session.id) {
+              <div class="relative flex items-center">
+                <!-- Timeline dot -->
+                <div
+                  class="absolute -left-[41px] h-4 w-4 rounded-full"
+                  [class]="
+                    session.type === 'focus'
+                      ? 'bg-[#2ea44f]'
+                      : session.type === 'short-break'
+                        ? 'bg-[#6b7280]'
+                        : 'bg-[#0364ff]'
+                  "
+                ></div>
+
+                <!-- Session Card -->
+                <div
+                  class="flex flex-1 items-center justify-between rounded-lg border-[0.5px] border-[#e1e4e8]/20 bg-[#24292e] px-6 py-4"
+                >
+                  <div class="flex items-center gap-4">
+                    <div class="flex flex-col gap-1">
+                      <div class="flex items-center gap-3">
+                        <span class="font-['Fira_Mono',monospace] text-[14px] font-bold text-white">
+                          {{ getTypeLabel(session.type) }}
+                        </span>
+                        @if (session.status === 'completed') {
+                          <span
+                            class="rounded-full px-2 py-0.5 font-['Cutive_Mono',monospace] text-[13px]"
+                            [class]="
+                              session.type === 'focus'
+                                ? 'bg-[rgba(46,164,79,0.3)] text-[#20e457]'
+                                : session.type === 'long-break'
+                                  ? 'bg-[rgba(3,100,255,0.3)] text-[#0364ff]'
+                                  : 'bg-[rgba(46,164,79,0.3)] text-[#20e457]'
+                            "
+                          >
+                            Completed
+                          </span>
+                        } @else {
+                          <span
+                            class="rounded-full bg-[rgba(13,17,23,0.3)] px-2 py-0.5 font-['Cutive_Mono',monospace] text-[13px] text-[#808080]"
+                          >
+                            Skipped
+                          </span>
+                        }
+                      </div>
+                      <span class="font-['Cutive_Mono',monospace] text-[11px] text-white/60">
+                        @if (session.description) {
+                          {{ session.description }}
+                        } @else {
+                          Without description
+                        }
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-4">
+                    <div class="flex flex-col items-end gap-1">
+                      <span class="font-['Fira_Mono',monospace] text-[14px] font-bold text-white">
+                        {{ formatTimeRange(session) }}
+                      </span>
+                      <span class="font-['Cutive_Mono',monospace] text-[11px] text-white/60">
+                        {{ session.durationMinutes }} min
+                      </span>
+                    </div>
+                    <div
+                      class="flex h-8 w-8 items-center justify-center text-white/30"
+                      aria-hidden="true"
+                    >
+                      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="12" cy="6" r="1.5" />
+                        <circle cx="12" cy="12" r="1.5" />
+                        <circle cx="12" cy="18" r="1.5" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="mt-8 flex flex-col items-center justify-center gap-4 rounded-lg border-[0.5px] border-[#e1e4e8]/10 bg-[#24292e]/50 py-16">
+          <svg class="h-16 w-16 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span class="font-['Cutive_Mono',monospace] text-[16px] text-white/40">
+            No sessions recorded yet
+          </span>
+          <span class="font-['Cutive_Mono',monospace] text-[14px] text-white/30">
+            Start a Pomodoro to begin tracking your productivity
+          </span>
+        </div>
+      }
+    </div>
+  </main>
+</app-main-layout>

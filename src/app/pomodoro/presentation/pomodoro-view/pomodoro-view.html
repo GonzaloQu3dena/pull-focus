@@ -118,5 +118,51 @@
         }
       </div>
     </div>
+
+    <!-- Long Break Info -->
+    <div class="mt-4 flex w-full max-w-[471px] items-center gap-2 px-1">
+      <svg class="h-4 w-4 shrink-0 text-white/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="16" x2="12" y2="12" />
+        <line x1="12" y1="8" x2="12.01" y2="8" />
+      </svg>
+      @if (sessionsUntilLongBreak() === 0) {
+        <span class="font-['Cutive_Mono',monospace] text-[13px] text-[#56b976]">
+          Long break unlocked! You've earned it.
+        </span>
+      } @else {
+        <span class="font-['Cutive_Mono',monospace] text-[13px] text-white/40">
+          {{ sessionsUntilLongBreak() }} focus session{{ sessionsUntilLongBreak() > 1 ? 's' : '' }} until long break
+        </span>
+      }
+    </div>
+
+    <!-- Reset Actions -->
+    <div class="mt-8 flex flex-col items-center gap-3">
+      @if (store.cyclesCount() > 0) {
+        <button
+          (click)="store.resetCycles()"
+          class="flex items-center gap-2 font-['Cutive_Mono',monospace] text-[13px] text-white/30 hover:text-white/60 transition-colors"
+        >
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
+          Reset progress
+        </button>
+      }
+
+      <button
+        (click)="store.fullReset()"
+        class="flex items-center gap-2 font-['Cutive_Mono',monospace] text-[13px] text-[#f85149]/50 hover:text-[#f85149] transition-colors"
+      >
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18" />
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+        </svg>
+        Reset all data & settings
+      </button>
+    </div>
   </main>
 </app-main-layout>
