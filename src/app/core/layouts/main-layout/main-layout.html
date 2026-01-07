@@ -18,15 +18,28 @@
     <div
       class="flex items-center gap-4 bg-[#0d1117] p-1.5 rounded-lg border-[0.5px] border-[#e1e4e8]/20"
     >
-      <button class="rounded-md bg-[#24292e] px-6 py-1.5 text-[15px] font-medium shadow-sm">
+      <a
+        routerLink="/pomodoro"
+        routerLinkActive="bg-[#24292e] opacity-100"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="rounded-md px-6 py-1.5 text-[15px] font-medium opacity-60 hover:opacity-100 transition-all shadow-sm"
+      >
         Timer
-      </button>
-      <button class="px-6 py-1.5 text-[15px] opacity-60 hover:opacity-100 transition-opacity">
+      </a>
+      <a
+        routerLink="/sessions"
+        routerLinkActive="bg-[#24292e] opacity-100"
+        class="rounded-md px-6 py-1.5 text-[15px] font-medium opacity-60 hover:opacity-100 transition-all shadow-sm"
+      >
         Sessions
-      </button>
-      <button class="px-6 py-1.5 text-[15px] opacity-60 hover:opacity-100 transition-opacity">
+      </a>
+      <a
+        routerLink="/pomodoro/settings"
+        routerLinkActive="bg-[#24292e] opacity-100"
+        class="rounded-md px-6 py-1.5 text-[15px] font-medium opacity-60 hover:opacity-100 transition-all shadow-sm"
+      >
         Settings
-      </button>
+      </a>
     </div>
 
     <div class="w-[60px]"></div>
