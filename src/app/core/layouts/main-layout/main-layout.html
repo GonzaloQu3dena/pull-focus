@@ -1,18 +1,11 @@
-<div class="flex min-h-screen flex-col items-center bg-[#0d1117] font-['Cutive_Mono',monospace] text-white">
+<div
+  class="flex min-h-screen flex-col items-center bg-[#0d1117] font-['Cutive_Mono',monospace] text-white"
+>
   <!-- Navbar -->
   <nav class="flex h-[100px] w-full items-center justify-between bg-[#24292e] px-10 shadow-sm">
     <div class="flex h-[57px] w-[60px] items-center justify-center">
-      <!-- Simple Clock Logo -->
-      <svg
-        class="h-10 w-10 text-[#2ea44f]"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
-      </svg>
+      <!-- Project Logo -->
+      <img ngSrc="pull-focus-logo.webp" width="60" height="57" alt="Pull Focus Logo" priority />
     </div>
 
     <div
@@ -49,4 +42,3 @@
   <!-- Content -->
   <ng-content></ng-content>
 </div>
-
