@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal, effect, DestroyRef } from '@angular/core';
 
 import { Timer } from '../domain/model/timer.entity';
 import { TimerStatus } from '../domain/value-objects/timer-status';
@@ -15,6 +15,7 @@ import { TimerMode, TIMER_DURATIONS } from '../domain/value-objects/timer-mode';
 export class TimerStore {
   // State
   private _storage = inject(TimerStorage);
+  private _destroyRef = inject(DestroyRef);
   private _timer = signal<Timer>(this._initialTimer());
   private _intervalId: any = null;
 
@@ -42,6 +43,17 @@ export class TimerStore {
     if (this.status() === 'running') {
       this._startCountdown();
     }
+
+    // Cleanup on destroy
+    this._destroyRef.onDestroy(() => {
+      this._stopCountdown();
+    });
+
+    // Auto-save timer state changes
+    effect(() => {
+      const timer = this._timer();
+      this._storage.save(timer);
+    });
   }
 
   /**
@@ -110,7 +122,7 @@ export class TimerStore {
     let nextMode: TimerMode;
 
     if (currentMode === 'focus') {
-      nextMode = cycles > 0 && cycles % 4 === 0 ? 'long-break' : 'short-break';
+      nextMode = cycles % 4 === 0 && cycles > 0 ? 'long-break' : 'short-break';
     } else {
       nextMode = 'focus';
     }
@@ -175,18 +187,19 @@ export class TimerStore {
       cyclesCount: number;
     }>
   ): void {
-    this._timer.update((current) => {
-      if (partial.mode !== undefined) current.mode = partial.mode;
-      if (partial.status !== undefined) current.status = partial.status;
-      if (partial.startedAt !== undefined) current.startedAt = partial.startedAt;
-      if (partial.pausedAt !== undefined) current.pausedAt = partial.pausedAt;
-      if (partial.completedAt !== undefined) current.completedAt = partial.completedAt;
-      if (partial.remainingSeconds !== undefined)
-        current.remainingSeconds = partial.remainingSeconds;
-      if (partial.cyclesCount !== undefined) current.cyclesCount = partial.cyclesCount;
-
-      this._storage.save(current);
-      return current;
+    const current = this._timer();
+    
+    const updated = new Timer({
+      id: current.id,
+      mode: partial.mode ?? current.mode,
+      status: partial.status ?? current.status,
+      startedAt: partial.startedAt !== undefined ? partial.startedAt : current.startedAt,
+      pausedAt: partial.pausedAt !== undefined ? partial.pausedAt : current.pausedAt,
+      completedAt: partial.completedAt !== undefined ? partial.completedAt : current.completedAt,
+      remainingSeconds: partial.remainingSeconds ?? current.remainingSeconds,
+      cyclesCount: partial.cyclesCount ?? current.cyclesCount,
     });
+
+    this._timer.set(updated);
   }
 }

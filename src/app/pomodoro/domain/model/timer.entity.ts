@@ -36,18 +36,24 @@ export class Timer implements BaseEntity {
     id: number;
     mode: TimerMode;
     status: TimerStatus;
-    startedAt: number | null;
-    pausedAt: number | null;
-    completedAt: number | null;
+    startedAt: Date | number | null;
+    pausedAt: Date | number | null;
+    completedAt: Date | number | null;
     remainingSeconds: number;
     cyclesCount: number;
   }) {
     this._id = timer.id;
     this._mode = timer.mode;
     this._status = timer.status;
-    this._startedAt = timer.startedAt ? new Date(timer.startedAt) : null;
-    this._pausedAt = timer.pausedAt ? new Date(timer.pausedAt) : null;
-    this._completedAt = timer.completedAt ? new Date(timer.completedAt) : null;
+    this._startedAt = timer.startedAt instanceof Date 
+      ? timer.startedAt 
+      : timer.startedAt ? new Date(timer.startedAt) : null;
+    this._pausedAt = timer.pausedAt instanceof Date 
+      ? timer.pausedAt 
+      : timer.pausedAt ? new Date(timer.pausedAt) : null;
+    this._completedAt = timer.completedAt instanceof Date 
+      ? timer.completedAt 
+      : timer.completedAt ? new Date(timer.completedAt) : null;
     this._remainingSeconds = timer.remainingSeconds;
     this._cyclesCount = timer.cyclesCount;
   }
