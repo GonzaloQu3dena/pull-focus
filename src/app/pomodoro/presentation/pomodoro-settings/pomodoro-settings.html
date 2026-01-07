@@ -1,0 +1,143 @@
+<app-main-layout>
+  <main class="mt-16 flex w-full flex-col items-center px-4">
+    <div
+      class="flex w-full max-w-[471px] flex-col overflow-hidden rounded-xl border-[0.5px] border-[#e1e4e8]/20 bg-[#24292e] shadow-xl"
+    >
+      <form [formGroup]="settingsForm" (ngSubmit)="save()" class="flex flex-col gap-6 p-6">
+        <!-- Timer Section -->
+        <section class="flex flex-col gap-4">
+          <header class="flex flex-col gap-1">
+            <h2 class="font-['Fira_Mono',monospace] text-[18px] font-medium text-white">Timer</h2>
+            <p class="font-['Cutive_Mono',monospace] text-[14px] text-white/60">
+              Adjust the time intervals for your focus and rest sessions.
+            </p>
+          </header>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div class="flex flex-col gap-2">
+              <label class="font-['Fira_Mono',monospace] text-[14px] text-white">Pomodoro</label>
+              <div
+                class="flex h-[32px] items-center rounded-md border-[0.5px] border-[#e1e4e8]/20 bg-[#0d1117] px-3"
+              >
+                <input
+                  type="number"
+                  formControlName="focusDuration"
+                  class="w-full bg-transparent font-['Cutive_Mono',monospace] text-[14px] text-white outline-none"
+                />
+                <span class="ml-1 font-['Cutive_Mono',monospace] text-[10px] text-white/40"
+                  >min</span
+                >
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-['Fira_Mono',monospace] text-[14px] text-white">Short break</label>
+              <div
+                class="flex h-[32px] items-center rounded-md border-[0.5px] border-[#e1e4e8]/20 bg-[#0d1117] px-3"
+              >
+                <input
+                  type="number"
+                  formControlName="shortBreakDuration"
+                  class="w-full bg-transparent font-['Cutive_Mono',monospace] text-[14px] text-white outline-none"
+                />
+                <span class="ml-1 font-['Cutive_Mono',monospace] text-[10px] text-white/40"
+                  >min</span
+                >
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-['Fira_Mono',monospace] text-[14px] text-white">Long break</label>
+              <div
+                class="flex h-[32px] items-center rounded-md border-[0.5px] border-[#e1e4e8]/20 bg-[#0d1117] px-3"
+              >
+                <input
+                  type="number"
+                  formControlName="longBreakDuration"
+                  class="w-full bg-transparent font-['Cutive_Mono',monospace] text-[14px] text-white outline-none"
+                />
+                <span class="ml-1 font-['Cutive_Mono',monospace] text-[10px] text-white/40"
+                  >min</span
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="h-[0.5px] w-full bg-[#e1e4e8]/10"></div>
+
+        <!-- Cycles Section -->
+        <section class="flex flex-col gap-4">
+          <header class="flex flex-col gap-1">
+            <h2 class="font-['Fira_Mono',monospace] text-[18px] font-medium text-white">Cycles</h2>
+            <p class="font-['Cutive_Mono',monospace] text-[14px] text-white/60">
+              Configure when a longer break should occur.
+            </p>
+          </header>
+
+          <div
+            class="flex items-center justify-between rounded-lg border-[0.5px] border-[#e1e4e8]/10 bg-[#0d1117] p-4"
+          >
+            <div class="flex flex-col gap-1">
+              <span class="font-['Fira_Mono',monospace] text-[14px] text-white"
+                >Round interval</span
+              >
+              <span class="font-['Cutive_Mono',monospace] text-[14px] text-white/40"
+                >Rounds before the long break</span
+              >
+            </div>
+            <div
+              class="flex h-[32px] w-[80px] items-center justify-end rounded-md border-[0.5px] border-[#e1e4e8]/20 bg-[#0d1117] px-3"
+            >
+              <input
+                type="number"
+                formControlName="roundInterval"
+                class="w-full bg-transparent text-right font-['Cutive_Mono',monospace] text-[14px] text-white outline-none"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- Automatic Start Section -->
+        <section class="flex items-center justify-between">
+          <div class="flex flex-col gap-1">
+            <span class="font-['Fira_Mono',monospace] text-[14px] text-white">Automatic start</span>
+            <span class="font-['Cutive_Mono',monospace] text-[14px] text-white/40"
+              >Start breaks automatically</span
+            >
+          </div>
+          <button
+            type="button"
+            (click)="toggleAutoStart()"
+            class="relative flex h-[32px] w-[70px] items-center rounded-full border-[0.5px] border-[#e1e4e8]/20 bg-[#0d1117] p-1 transition-colors"
+            [class.bg-[#2ea44f]]="settingsForm.get('autoStart')?.value"
+          >
+            <div
+              class="h-[24px] w-[24px] rounded-full bg-white shadow-md transition-transform"
+              [class.translate-x-[38px]]="settingsForm.get('autoStart')?.value"
+            ></div>
+          </button>
+        </section>
+
+        <div class="h-[0.5px] w-full bg-[#e1e4e8]/10"></div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-3">
+          <app-custom-btn
+            variant="outline"
+            type="button"
+            (btnClick)="cancel()"
+          >
+            Cancel
+          </app-custom-btn>
+          <app-custom-btn
+            variant="primary"
+            type="submit"
+          >
+            Save
+          </app-custom-btn>
+        </div>
+      </form>
+    </div>
+  </main>
+</app-main-layout>

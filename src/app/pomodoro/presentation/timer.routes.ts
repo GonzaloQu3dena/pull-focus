@@ -5,4 +5,9 @@ export const TIMER_ROUTES: Routes = [
     path: '',
     loadComponent: () => import('./pomodoro-view/pomodoro-view').then((m) => m.PomodoroView),
   },
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('./pomodoro-settings/pomodoro-settings').then((m) => m.PomodoroSettings),
+  },
 ];

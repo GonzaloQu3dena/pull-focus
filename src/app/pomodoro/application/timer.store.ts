@@ -3,7 +3,8 @@ import { Injectable, computed, inject, signal, effect, DestroyRef } from '@angul
 import { Timer } from '../domain/model/timer.entity';
 import { TimerStatus } from '../domain/value-objects/timer-status';
 import { TimerStorage } from '../infrastructure/persistence/timer-storage';
-import { TimerMode, TIMER_DURATIONS } from '../domain/value-objects/timer-mode';
+import { TimerMode } from '../domain/value-objects/timer-mode';
+import { SettingsStore } from './settings.store';
 
 /**
  * Timer Store
@@ -15,6 +16,7 @@ import { TimerMode, TIMER_DURATIONS } from '../domain/value-objects/timer-mode';
 export class TimerStore {
   // State
   private _storage = inject(TimerStorage);
+  private _settingsStore = inject(SettingsStore);
   private _destroyRef = inject(DestroyRef);
   private _timer = signal<Timer>(this._initialTimer());
   private _intervalId: any = null;
@@ -34,7 +36,7 @@ export class TimerStore {
   });
 
   readonly progress = computed(() => {
-    const duration = TIMER_DURATIONS[this.mode()];
+    const duration = this._getDuration(this.mode());
     return ((duration - this.remainingSeconds()) / duration) * 100;
   });
 
@@ -53,6 +55,19 @@ export class TimerStore {
     effect(() => {
       const timer = this._timer();
       this._storage.save(timer);
+    });
+
+    // Sync with settings when they change
+    effect(() => {
+      const status = this.status();
+      const mode = this.mode();
+      
+      if (status === 'idle') {
+        const newDuration = this._getDuration(mode);
+        if (this.remainingSeconds() !== newDuration) {
+          this._updateTimer({ remainingSeconds: newDuration });
+        }
+      }
     });
   }
 
@@ -93,7 +108,7 @@ export class TimerStore {
       startedAt: null,
       pausedAt: null,
       completedAt: null,
-      remainingSeconds: TIMER_DURATIONS[this.mode()],
+      remainingSeconds: this._getDuration(this.mode()),
     });
   }
 
@@ -109,7 +124,7 @@ export class TimerStore {
       startedAt: null,
       pausedAt: null,
       completedAt: null,
-      remainingSeconds: TIMER_DURATIONS[mode],
+      remainingSeconds: this._getDuration(mode),
     });
   }
 
@@ -119,15 +134,27 @@ export class TimerStore {
   nextMode(): void {
     const currentMode = this.mode();
     const cycles = this.cyclesCount();
+    const roundInterval = this._settingsStore.roundInterval();
     let nextMode: TimerMode;
 
     if (currentMode === 'focus') {
-      nextMode = cycles % 4 === 0 && cycles > 0 ? 'long-break' : 'short-break';
+      nextMode = cycles % roundInterval === 0 && cycles > 0 ? 'long-break' : 'short-break';
     } else {
       nextMode = 'focus';
     }
 
     this.changeMode(nextMode);
+  }
+
+  private _getDuration(mode: TimerMode): number {
+    switch (mode) {
+      case 'focus':
+        return this._settingsStore.focusDuration() * 60;
+      case 'short-break':
+        return this._settingsStore.shortBreakDuration() * 60;
+      case 'long-break':
+        return this._settingsStore.longBreakDuration() * 60;
+    }
   }
 
   private _initialTimer(): Timer {
@@ -141,7 +168,7 @@ export class TimerStore {
       startedAt: null,
       pausedAt: null,
       completedAt: null,
-      remainingSeconds: TIMER_DURATIONS['focus'],
+      remainingSeconds: this._settingsStore.focusDuration() * 60,
       cyclesCount: 0,
     });
   }
