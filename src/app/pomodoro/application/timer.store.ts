@@ -201,6 +201,11 @@ export class TimerStore {
       completedAt: new Date(),
       cyclesCount: isFocus ? this.cyclesCount() + 1 : this.cyclesCount(),
     });
+
+    if (this._settingsStore.autoStart() && isFocus) {
+      this.nextMode();
+      this.start();
+    }
   }
 
   private _updateTimer(
