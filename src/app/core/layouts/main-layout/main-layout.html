@@ -1,0 +1,39 @@
+<div class="flex min-h-screen flex-col items-center bg-[#0d1117] font-['Cutive_Mono',monospace] text-white">
+  <!-- Navbar -->
+  <nav class="flex h-[100px] w-full items-center justify-between bg-[#24292e] px-10 shadow-sm">
+    <div class="flex h-[57px] w-[60px] items-center justify-center">
+      <!-- Simple Clock Logo -->
+      <svg
+        class="h-10 w-10 text-[#2ea44f]"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    </div>
+
+    <div
+      class="flex items-center gap-4 bg-[#0d1117] p-1.5 rounded-lg border-[0.5px] border-[#e1e4e8]/20"
+    >
+      <button class="rounded-md bg-[#24292e] px-6 py-1.5 text-[15px] font-medium shadow-sm">
+        Timer
+      </button>
+      <button class="px-6 py-1.5 text-[15px] opacity-60 hover:opacity-100 transition-opacity">
+        Sessions
+      </button>
+      <button class="px-6 py-1.5 text-[15px] opacity-60 hover:opacity-100 transition-opacity">
+        Settings
+      </button>
+    </div>
+
+    <div class="w-[60px]"></div>
+    <!-- Spacer to center the nav set -->
+  </nav>
+
+  <!-- Content -->
+  <ng-content></ng-content>
+</div>
+
