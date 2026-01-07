@@ -1,3 +1,5 @@
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID, inject } from '@angular/core';
 import { BaseEntity } from '@shared/domain/model/base-entity';
 
 import { BaseResource } from './base-resource';
@@ -18,6 +20,9 @@ export abstract class BaseLocalStorage<
   TResource extends BaseResource,
   TAssembler extends BaseAssembler<TEntity, TResource>
 > extends ErrorHandlingEnabledBaseType {
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly isBrowser = isPlatformBrowser(this.platformId);
+
   /**
    * The storage key for the local storage.
    */
@@ -36,6 +41,8 @@ export abstract class BaseLocalStorage<
    * @param entity - The entity to save.
    */
   save(entity: TEntity): void {
+    if (!this.isBrowser) return;
+
     try {
       const resource = this.assembler.toResourceFromEntity(entity);
       localStorage.setItem(this.storageKey, JSON.stringify(resource));
@@ -49,6 +56,8 @@ export abstract class BaseLocalStorage<
    * @returns The entity or null if not found.
    */
   get(): TEntity | null {
+    if (!this.isBrowser) return null;
+
     try {
       const item = localStorage.getItem(this.storageKey);
       if (!item) {
@@ -66,6 +75,8 @@ export abstract class BaseLocalStorage<
    * Remove the entity from local storage.
    */
   remove(): void {
+    if (!this.isBrowser) return;
+
     try {
       localStorage.removeItem(this.storageKey);
     } catch (error) {
@@ -77,6 +88,8 @@ export abstract class BaseLocalStorage<
    * Clear all items from local storage.
    */
   clear(): void {
+    if (!this.isBrowser) return;
+
     try {
       localStorage.clear();
     } catch (error) {
